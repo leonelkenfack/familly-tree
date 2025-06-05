@@ -3,6 +3,7 @@ package com.famillytree.node.service;
 import com.famillytree.auth.repository.UserRepository;
 import com.famillytree.node.dto.NodeRelationDTO;
 import com.famillytree.node.dto.NodeRequest;
+import com.famillytree.node.dto.NodeUpdateRequest;
 import com.famillytree.node.exception.NodeException;
 import com.famillytree.node.model.Node;
 import com.famillytree.node.model.NodeRelation;
@@ -30,7 +31,7 @@ public class NodeService {
 
     @Transactional
     public Node createNode(NodeRequest request) {
-        validateNodeRequest(request);
+        validateCreateNodeRequest(request);
 
         // Récupérer l'ID de l'utilisateur à partir du contexte de sécurité
         Long userId = getCurrentUserId();
@@ -82,7 +83,7 @@ public class NodeService {
     }
 
     @Transactional
-    public Node updateNode(Long id, NodeRequest request) {
+    public Node updateNode(Long id, NodeUpdateRequest request) {
         if (id == null) {
             throw NodeException.invalidInput("Node ID cannot be null");
         }
@@ -103,7 +104,7 @@ public class NodeService {
         }
 
         // Vérifier la contrainte de baseNode
-        validateBaseNodeConstraint(currentUserId, request.getBaseNode(), id);
+        // validateBaseNodeConstraint(currentUserId, request.getBaseNode(), id);
         
         // Mettre à jour les champs du nœud
         node.setTitle(request.getTitle());
@@ -114,12 +115,12 @@ public class NodeService {
         node.setAddress(request.getAddress());
         node.setPhone(request.getPhone());
         node.setInterests(request.getInterests());
-        node.setBaseNode(request.getBaseNode() != null ? request.getBaseNode() : node.isBaseNode());
+        // node.setBaseNode(request.getBaseNode() != null ? request.getBaseNode() : node.isBaseNode());
 
         return nodeRepository.save(node);
     }
 
-    private void validateNodeRequest(NodeRequest request) {
+    private void validateNodeRequest(NodeUpdateRequest request) {
         if (request == null) {
             throw NodeException.invalidInput("Request cannot be null");
         }
@@ -302,6 +303,24 @@ public class NodeService {
             throw NodeException.invalidInput("Nœud de base non trouvé pour l'utilisateur");
         }
         return baseNodes.get(0);
+    }
+
+    private void validateCreateNodeRequest(NodeRequest request) {
+        if (request == null) {
+            throw NodeException.invalidInput("Request cannot be null");
+        }
+        if (!StringUtils.hasText(request.getFirstName())) {
+            throw NodeException.invalidInput("First name is required");
+        }
+        if (!StringUtils.hasText(request.getLastName())) {
+            throw NodeException.invalidInput("Last name is required");
+        }
+        if (request.getBirthDate() == null) {
+            throw NodeException.invalidInput("Birth date is required");
+        }
+        if (request.getGender() == null) {
+            throw NodeException.invalidInput("Gender is required");
+        }
     }
 
 } 

@@ -1,8 +1,8 @@
 package com.famillytree.node.controller;
 
 import com.famillytree.node.dto.NodeRequest;
+import com.famillytree.node.dto.NodeUpdateRequest;
 import com.famillytree.node.dto.NodeRelationDTO;
-import com.famillytree.node.exception.NodeException;
 import com.famillytree.node.model.Node;
 import com.famillytree.node.service.NodeService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -87,7 +87,7 @@ public class NodeController {
             @Parameter(description = "ID du nœud à mettre à jour", required = true)
             @PathVariable Long id,
             @Parameter(description = "Nouvelles données du nœud", required = true)
-            @Valid @RequestBody NodeRequest request) {
+            @Valid @RequestBody NodeUpdateRequest request) {
         return ResponseEntity.ok(nodeService.updateNode(id, request));
     }
 } 

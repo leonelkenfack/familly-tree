@@ -32,6 +32,11 @@ public class InvitationService {
             throw NodeException.unauthorized("Vous n'êtes pas autorisé à créer une invitation pour ce nœud");
         }
 
+        // Vérifier que le nœud n'est pas un baseNode
+        if (node.isBaseNode()) {
+            throw NodeException.invalidInput("Impossible de créer une invitation pour un nœud de base");
+        }
+
         // Générer un code d'invitation unique à 6 chiffres
         String invitationCode = generateUniqueInvitationCode();
 
