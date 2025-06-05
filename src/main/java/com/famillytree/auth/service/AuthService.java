@@ -8,6 +8,8 @@ import com.famillytree.auth.exception.AuthException;
 import com.famillytree.auth.model.User;
 import com.famillytree.auth.repository.UserRepository;
 import com.famillytree.auth.security.JwtService;
+import com.famillytree.node.model.Node;
+import com.famillytree.node.repository.NodeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -27,6 +29,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
+    private final NodeRepository nodeRepository;
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
@@ -56,6 +59,7 @@ public class AuthService {
                 .build();
     }
 
+    @Transactional
     public AuthResponse login(AuthRequest request) {
         try {
             authenticationManager.authenticate(
@@ -74,11 +78,18 @@ public class AuthService {
         String accessToken = jwtService.generateToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
 
+        // Récupérer le nœud de base de l'utilisateur
+        Node baseNode = nodeRepository.findByUserIdAndBaseNodeIsTrue(user.getId())
+                .stream()
+                .findFirst()
+                .orElse(null);
+
         return AuthResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .username(user.getUsername())
                 .email(user.getEmail())
+                .baseNode(baseNode)
                 .build();
     }
 

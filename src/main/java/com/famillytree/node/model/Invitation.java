@@ -24,8 +24,8 @@ public class Invitation {
     @Column(name = "node_id", nullable = false)
     private Long nodeId;
 
-    @Column(name = "invitation_key", nullable = false, unique = true)
-    private String invitationKey;
+    @Column(name = "invitation_code", nullable = false, unique = true, length = 6)
+    private String invitationCode;
 
     @Column(nullable = false)
     private boolean used;

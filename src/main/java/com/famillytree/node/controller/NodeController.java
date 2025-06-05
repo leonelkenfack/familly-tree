@@ -1,6 +1,8 @@
 package com.famillytree.node.controller;
 
 import com.famillytree.node.dto.NodeRequest;
+import com.famillytree.node.dto.NodeRelationDTO;
+import com.famillytree.node.exception.NodeException;
 import com.famillytree.node.model.Node;
 import com.famillytree.node.service.NodeService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,7 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/nodes")
@@ -44,14 +46,17 @@ public class NodeController {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Récupérer tous les nœuds", description = "Récupère la liste de tous les nœuds de l'arbre généalogique")
+    @Operation(summary = "Récupérer les relations familiales", description = "Récupère toutes les relations familiales à partir du nœud de base de l'utilisateur authentifié")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Liste des nœuds récupérée avec succès",
-            content = @Content(schema = @Schema(implementation = Node.class))),
-        @ApiResponse(responseCode = "401", description = "Non authentifié")
+        @ApiResponse(responseCode = "200", description = "Relations familiales récupérées avec succès",
+            content = @Content(schema = @Schema(implementation = NodeRelationDTO.class))),
+        @ApiResponse(responseCode = "401", description = "Non authentifié"),
+        @ApiResponse(responseCode = "404", description = "Nœud de base non trouvé")
     })
-    public ResponseEntity<List<Node>> getAllNodes() {
-        return ResponseEntity.ok(nodeService.getAllNodes());
+    public ResponseEntity<Set<NodeRelationDTO>> getFamilyRelations() {
+        Node baseNode = nodeService.getBaseNode();
+        Set<NodeRelationDTO> relations = nodeService.getAllFamilyRelations(baseNode);
+        return ResponseEntity.ok(relations);
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

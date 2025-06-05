@@ -20,8 +20,8 @@ public class InvitationResponse {
     @Schema(description = "ID of the node", example = "1")
     private Long nodeId;
 
-    @Schema(description = "Unique invitation key", example = "abc123def456")
-    private String invitationKey;
+    @Schema(description = "Unique 6-digit invitation code", example = "123456")
+    private String invitationCode;
 
     @Schema(description = "Whether the invitation has been used", example = "false")
     private boolean used;
