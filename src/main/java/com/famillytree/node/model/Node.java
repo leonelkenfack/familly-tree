@@ -49,6 +49,6 @@ public class Node {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    @Column(name = "base_node", nullable = false)
+    @Column(name = "base_node", nullable = false, columnDefinition = "boolean default false")
     private boolean baseNode;
 } 
