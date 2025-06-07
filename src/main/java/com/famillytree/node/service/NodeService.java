@@ -1,6 +1,7 @@
 package com.famillytree.node.service;
 
 import com.famillytree.auth.repository.UserRepository;
+import com.famillytree.node.dto.NodeDTO;
 import com.famillytree.node.dto.NodeRelationDTO;
 import com.famillytree.node.dto.NodeRequest;
 import com.famillytree.node.dto.NodeUpdateRequest;
@@ -210,8 +211,8 @@ public class NodeService {
         List<NodeRelation> parentRelations = nodeRelationRepository.findByNode2AndRelation(node, NodeRelation.RelationType.CHILD);
         for (NodeRelation relation : parentRelations) {
             NodeRelationDTO dto = NodeRelationDTO.builder()
-                    .node1(relation.getNode1())
-                    .node2(relation.getNode2())
+                    .node1(convertToDTO(relation.getNode1()))
+                    .node2(convertToDTO(relation.getNode2()))
                     .relationType(relation.getRelation())
                     .build();
             if (relations.add(dto)) {
@@ -230,8 +231,8 @@ public class NodeService {
         List<NodeRelation> childRelations = nodeRelationRepository.findByNode1AndRelation(node, NodeRelation.RelationType.CHILD);
         for (NodeRelation relation : childRelations) {
             NodeRelationDTO dto = NodeRelationDTO.builder()
-                    .node1(relation.getNode1())
-                    .node2(relation.getNode2())
+                    .node1(convertToDTO(relation.getNode1()))
+                    .node2(convertToDTO(relation.getNode2()))
                     .relationType(relation.getRelation())
                     .build();
             if (relations.add(dto)) {
@@ -248,8 +249,8 @@ public class NodeService {
             List<Node> siblings = getSiblings(parent);
             for (Node sibling : siblings) {
                 relations.add(NodeRelationDTO.builder()
-                        .node1(parent)
-                        .node2(sibling)
+                        .node1(convertToDTO(parent))
+                        .node2(convertToDTO(sibling))
                         .relationType(NodeRelation.RelationType.SIBLING)
                         .build());
             }
@@ -275,23 +276,21 @@ public class NodeService {
     public Set<NodeRelationDTO> getAllFamilyRelations(Node node) {
         Set<NodeRelationDTO> allRelations = new HashSet<>();
         
-        // Ajouter toutes les relations
         allRelations.addAll(getAllAncestorRelations(node));
         allRelations.addAll(getAllDescendantRelations(node));
         allRelations.addAll(getUncleAndAuntRelations(node));
         allRelations.addAll(getCousinRelations(node));
         
-        // Ajouter les relations de conjoints
         List<NodeRelation> spouseRelations = nodeRelationRepository.findByNode1AndRelation(node, NodeRelation.RelationType.SPOUSE);
         spouseRelations.addAll(nodeRelationRepository.findByNode2AndRelation(node, NodeRelation.RelationType.SPOUSE));
-        
-        for (NodeRelation relation : spouseRelations) {
-            allRelations.add(NodeRelationDTO.builder()
-                    .node1(relation.getNode1())
-                    .node2(relation.getNode2())
-                    .relationType(relation.getRelation())
-                    .build());
-        }
+
+        allRelations.addAll(spouseRelations.stream()
+            .map(relation -> NodeRelationDTO.builder()
+                .node1(convertToDTO(relation.getNode1()))
+                .node2(convertToDTO(relation.getNode2()))
+                .relationType(relation.getRelation())
+                .build())
+            .collect(Collectors.toSet()));
         
         return allRelations;
     }
@@ -321,6 +320,22 @@ public class NodeService {
         if (request.getGender() == null) {
             throw NodeException.invalidInput("Gender is required");
         }
+    }
+
+    private NodeDTO convertToDTO(Node node) {
+        return NodeDTO.builder()
+                .id(node.getId())
+                .title(node.getTitle())
+                .firstName(node.getFirstName())
+                .lastName(node.getLastName())
+                .birthDate(node.getBirthDate())
+                .gender(node.getGender())
+                .address(node.getAddress())
+                .phone(node.getPhone())
+                .interests(node.getInterests())
+                .userId(node.getUserId())
+                .baseNode(node.isBaseNode())
+                .build();
     }
 
 } 

@@ -29,6 +29,7 @@
 	<properties>
 		<java.version>21</java.version>
 		<springdoc.version>2.3.0</springdoc.version>
+		<jackson.version>2.15.3</jackson.version>
 	</properties>
 	<dependencies>
 		<dependency>
