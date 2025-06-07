@@ -10,7 +10,7 @@ services:
       - DB_URL=jdbc:postgresql://postgres:5432/familytree
       - DB_USERNAME=postgres
       - DB_PASSWORD=postgres
-      - JWT_SECRET=your-256-bit-secret
+      - JWT_SECRET=8A6D2C4F1E9B3A7D5C8E2F4A1B9D6E3A8C5F2E7B4D1A9C6E3F8B5A2D7C4E9F1
       - JWT_EXPIRATION=86400000
     depends_on:
       - postgres
